@@ -15,8 +15,10 @@ app.get('/', (request, response) => {
 
 app.post('/signin', async (request, response) => {
     const {email, password} = request.body;
-    let user;
+    
+    if(!email || !password) return response.status(400).json('Incorrect from submission.');
 
+    let user;
     try {
         user = await User.findOne({ email: email });
     } catch (err) {
@@ -40,40 +42,42 @@ app.post('/signin', async (request, response) => {
 app.post('/register', async (request, response) => {
     const {name, email, password} = request.body;
 
-        let existingUser;
-        try {
-            existingUser = await User.findOne({email: email});
-        } catch (err) {
-            console.log(err);
+    if(!email || !password || !name) return response.status(400).json('Incorrect from submission.');
 
-        }
-        
-        if(existingUser) {
-            console.log('User already exists');
-        }
+    let existingUser;
+    try {
+        existingUser = await User.findOne({email: email});
+    } catch (err) {
+        console.log(err);
+
+    }
     
-        let hashedPassword;
-        try {
-            hashedPassword = await bcrypt.hash(password, 12);
-        } catch (err) {
-            console.log(err);
-        }
-        
-        let user = new User();
-        user.name = name;
-        user.email = email;
-        user.password = hashedPassword;
-        user.entries = 0;
-        user.joined = new Date();
+    if(existingUser) {
+        console.log('User already exists');
+    }
+
+    let hashedPassword;
+    try {
+        hashedPassword = await bcrypt.hash(password, 12);
+    } catch (err) {
+        console.log(err);
+    }
     
-        try {
-            await user.save();
-        } catch (err) {
-            console.log(err);
-        }
-    
-        // TODO, do not send the whole object.
-        return response.status(201).json({user: user.toObject({ getters: true })});
+    let user = new User();
+    user.name = name;
+    user.email = email;
+    user.password = hashedPassword;
+    user.entries = 0;
+    user.joined = new Date();
+
+    try {
+        await user.save();
+    } catch (err) {
+        console.log(err);
+    }
+
+    // TODO, do not send the whole object.
+    return response.status(201).json({user: user.toObject({ getters: true })});
 });
 
 app.get('/profile/:id', async (request, response) => {
