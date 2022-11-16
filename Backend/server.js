@@ -4,6 +4,12 @@ const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const User = require('./models/user');
 const user = require('./models/user');
+const Clarifai = require('clarifai');
+const { json } = require('express');
+
+const clarifaiApp = new Clarifai.App({
+    apiKey: process.env.CLARIFAI_KEY
+});
 
 const app = express();
 app.use(express.json());
@@ -107,6 +113,16 @@ app.put('/image', async (request, response) => {
     }
     
     return response.json(count);
+});
+
+app.post('/imageurl', (request, response) => {
+    const {input} = request.body;
+    
+    clarifaiApp.models.predict(Clarifai.FACE_DETECT_MODEL, input)
+    .then(data => {
+        response.json(data);
+    })
+    .catch(err => response.status(400).json('Unable to connect with Clarifai API.'))
 });
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_NAME}.g9zpdck.mongodb.net/?retryWrites=true&w=majority`)
