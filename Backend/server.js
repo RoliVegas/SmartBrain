@@ -126,5 +126,5 @@ app.post('/imageurl', (request, response) => {
 });
 
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_NAME}.g9zpdck.mongodb.net/?retryWrites=true&w=majority`)
-        .then(app.listen(3001))
+        .then(app.listen(process.env.PORT || 3001))
         .catch(console.log);
