@@ -7,7 +7,7 @@ class Signin extends React.Component {
             signInEmail: '',
             signInPassword: ''
         }
-  }
+    }
 
     onEmailChange = (event) => {
         this.setState({signInEmail: event.target.value})
@@ -24,6 +24,24 @@ class Signin extends React.Component {
             body: JSON.stringify({
                 email: this.state.signInEmail,
                 password: this.state.signInPassword
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.user){
+                this.props.loadUser(data.user)
+                this.props.onRouteChange('home');
+            }
+        })
+    }
+
+    onTryWithoutRegistration = () => {
+        fetch('https://peaceful-cliffs-63278.herokuapp.com/signin', {
+            method: 'post',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                email: 'public@user.com',
+                password: 'public'
             })
         })
         .then(response => response.json())
@@ -74,6 +92,10 @@ class Signin extends React.Component {
                 </div>
                 <div className="lh-copy mt3">
                     <p onClick={() => onRouteChange('register')} className="f6 link dim black db pointer">Register</p>
+                </div>
+
+                <div className="lh-copy mt3">
+                    <p onClick={this.onTryWithoutRegistration} className="f4 link dim black db pointer">Try without registration</p>
                 </div>
             </div>
             </main>
