@@ -1,11 +1,9 @@
 const express = require('express');
-const cors = require('cors');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const User = require('./models/user');
 const user = require('./models/user');
 const Clarifai = require('clarifai');
-const { json } = require('express');
 
 const clarifaiApp = new Clarifai.App({
     apiKey: process.env.CLARIFAI_KEY
@@ -13,10 +11,18 @@ const clarifaiApp = new Clarifai.App({
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT');
+
+    next();
+});
+
 
 app.get('/', (request, response) => {
-    response.send('Connected.');
+    response.send('Running.');
 });
 
 app.post('/signin', async (request, response) => {
